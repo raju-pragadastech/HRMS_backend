@@ -16,6 +16,14 @@ def get_database_url():
     if db_url.startswith("postgresql://"):
         logger.info("Using PostgreSQL database from Railway")
         
+        # Check if we're on Railway and can use private networking
+        if "railway.internal" in db_url:
+            logger.info("Using Railway private networking for database connection")
+        elif "turntable.proxy.rlwy.net" in db_url:
+            logger.info("Using Railway external database connection")
+        else:
+            logger.info("Using custom PostgreSQL connection")
+        
         # Add SSL mode if not present
         if "sslmode" not in db_url:
             if "?" in db_url:
@@ -23,7 +31,7 @@ def get_database_url():
             else:
                 db_url += "?sslmode=require"
         
-        logger.info(f"PostgreSQL URL configured with SSL: {db_url}")
+        logger.info(f"PostgreSQL URL configured: {db_url}")
         return db_url
     else:
         logger.info("Using SQLite database for local development")
@@ -35,18 +43,29 @@ def get_engine_config():
     
     if db_url.startswith("postgresql://"):
         # Railway PostgreSQL specific configuration
-        return {
+        config = {
             "pool_pre_ping": True,      # Verify connection before use
             "pool_recycle": 300,        # Recycle connections every 5 minutes
             "pool_size": settings.DB_POOL_SIZE,            # Connection pool size
             "max_overflow": settings.DB_MAX_OVERFLOW,         # Maximum overflow connections
             "echo": False,              # Set to True for SQL query logging
-            "connect_args": {
+        }
+        
+        # Add SSL configuration for external connections
+        if "railway.internal" not in db_url:
+            config["connect_args"] = {
                 "sslmode": settings.DB_SSL_MODE,   # Require SSL connection
                 "connect_timeout": 10,  # Connection timeout
                 "application_name": "hrms_backend"  # Application identifier
             }
-        }
+        else:
+            # Private networking doesn't need SSL
+            config["connect_args"] = {
+                "connect_timeout": 10,
+                "application_name": "hrms_backend"
+            }
+        
+        return config
     else:
         # SQLite configuration
         return {
@@ -87,6 +106,12 @@ def test_connection():
                 result = conn.execute("SELECT version()")
                 version = result.fetchone()[0]
                 logger.info(f"PostgreSQL connection successful: {version}")
+                
+                # Check if using private networking
+                if "railway.internal" in str(engine.url):
+                    logger.info("✅ Using Railway private networking")
+                else:
+                    logger.info("✅ Using external database connection")
             else:
                 result = conn.execute("SELECT 1")
                 logger.info("SQLite connection successful")
