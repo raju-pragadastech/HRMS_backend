@@ -4,16 +4,26 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from datetime import timedelta
 from typing import List
+import os
+import logging
 
-from database import engine, get_db
+from database import engine, get_db, init_db
 from models import Base, User, Employee
 from schemas import UserCreate, UserLogin, UserResponse, Token, EmployeeCreate, EmployeeResponse
 from crud import authenticate_user, create_user, create_employee, get_employee_by_user_id
 from auth import create_access_token, verify_token
 from config import settings
 
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 # Create database tables
-Base.metadata.create_all(bind=engine)
+try:
+    init_db()
+    logger.info("Database initialized successfully")
+except Exception as e:
+    logger.error(f"Database initialization failed: {e}")
 
 app = FastAPI(title="HRMS API", version="1.0.0")
 
@@ -121,12 +131,35 @@ def create_employee_profile(
 
 @app.get("/")
 def read_root():
-    return {"message": "HRMS API is running", "status": "success", "timestamp": "2024-01-01T00:00:00Z"}
+    return {"message": "Hello from HRMS Backend on Railway!", "status": "success", "timestamp": "2024-01-01T00:00:00Z"}
 
 @app.get("/api/test")
 def test_endpoint():
     return {"message": "Test endpoint working", "status": "success"}
 
+@app.get("/api/health")
+def health_check():
+    """Health check endpoint for Railway"""
+    try:
+        # Test database connection
+        db = next(get_db())
+        db.execute("SELECT 1")
+        db.close()
+        return {
+            "status": "healthy",
+            "database": "connected",
+            "message": "HRMS Backend is running successfully on Railway"
+        }
+    except Exception as e:
+        logger.error(f"Health check failed: {e}")
+        return {
+            "status": "unhealthy",
+            "database": "disconnected",
+            "error": str(e)
+        }
+
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8002)
+    # Railway injects PORT into env variable
+    port = int(os.environ.get("PORT", 8000))
+    uvicorn.run("main:app", host="0.0.0.0", port=port, reload=False)

@@ -1,111 +1,270 @@
 # HRMS Backend API
 
-This directory contains the FastAPI backend API for the HRMS application with PostgreSQL database.
+A FastAPI-based Human Resource Management System backend with PostgreSQL database support, designed for Railway deployment.
 
-## Technology Stack
+## 🚀 Features
 
-- **Backend**: FastAPI (Python)
-- **Database**: PostgreSQL
-- **Authentication**: JWT tokens
-- **ORM**: SQLAlchemy
+- **User Management**: Authentication, authorization, and role-based access control
+- **Employee Management**: Complete employee profiles and information
+- **Attendance Tracking**: Check-in/out and status management
+- **Leave Management**: Leave requests and approval workflow
+- **Payroll System**: Salary calculations and payment tracking
+- **PostgreSQL Database**: Production-ready with SSL encryption
+- **Railway Deployment**: Optimized for Railway cloud platform
 
-## Setup Instructions
+## 🏗️ Architecture
 
-### 1. Install Python Dependencies
+- **Framework**: FastAPI with Python 3.8+
+- **Database**: PostgreSQL with SQLAlchemy ORM
+- **Authentication**: JWT tokens with secure password hashing
+- **API Documentation**: Auto-generated with OpenAPI/Swagger
+- **CORS**: Configured for cross-origin requests
+- **SSL**: Secure database connections with Railway PostgreSQL
+
+## 📁 Project Structure
+
+```
+backend/
+├── main.py                 # FastAPI application entry point
+├── config.py              # Configuration and environment variables
+├── database.py            # Database connection and session management
+├── models.py              # SQLAlchemy database models
+├── schemas.py             # Pydantic data validation schemas
+├── auth.py                # JWT authentication and password hashing
+├── crud.py                # Database CRUD operations
+├── requirements.txt       # Python dependencies
+├── Procfile              # Railway deployment configuration
+├── railway.toml          # Railway-specific configuration
+├── deploy_railway.py     # Automated deployment script
+├── init_postgresql_db.py # Database initialization script
+└── README.md             # This file
+```
+
+## 🛠️ Installation & Setup
+
+### Prerequisites
+
+- Python 3.8 or higher
+- PostgreSQL database (local or Railway)
+- Railway account (for deployment)
+
+### Local Development
+
+1. **Clone the repository**
+   ```bash
+   git clone <your-repo-url>
+   cd backend
+   ```
+
+2. **Install dependencies**
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+3. **Set environment variables**
+   ```bash
+   # Create .env file
+   DATABASE_URL=postgresql://username:password@localhost:5432/hrms
+   JWT_SECRET=your-secret-key
+   ACCESS_TOKEN_EXPIRE_MINUTES=30
+   ```
+
+4. **Run the application**
+   ```bash
+   python main.py
+   ```
+
+   The API will be available at `http://localhost:8000`
+
+## 🚀 Railway Deployment
+
+### Quick Deploy
+
+1. **Install Railway CLI**
+   ```bash
+   npm install -g @railway/cli
+   ```
+
+2. **Deploy to Railway**
+   ```bash
+   cd backend
+   railway login
+   railway link
+   railway up
+   ```
+
+### Environment Variables
+
+Set these in Railway dashboard → Variables tab:
+
 ```bash
-pip install -r requirements.txt
+DATABASE_URL=postgresql://username:password@host:port/database?sslmode=require
+JWT_SECRET=your-production-secret-key
+ACCESS_TOKEN_EXPIRE_MINUTES=30
 ```
 
-### 2. Install PostgreSQL
-Make sure PostgreSQL is installed and running on your system.
+### Database Setup
 
-### 3. Configure Database
-Update the database connection in `config.py` or create a `.env` file:
-```
-DATABASE_URL=postgresql://username:password@localhost:5432/hrms_db
-JWT_SECRET=your-super-secret-jwt-key-change-this-in-production
-```
+After deployment, initialize your PostgreSQL database:
 
-### 4. Setup Database
 ```bash
-python setup_database.py
+railway shell
+python init_postgresql_db.py
 ```
 
-### 5. Run the Server
-```bash
-python start_server.py
-```
-
-The API will be available at `http://localhost:8000`
-
-## API Documentation
-
-Once the server is running, you can access:
-- Interactive API docs: `http://localhost:8000/docs`
-- Alternative API docs: `http://localhost:8000/redoc`
-
-## API Endpoints (To be implemented)
+## 📚 API Endpoints
 
 ### Authentication
 - `POST /api/auth/login` - User login
-- `POST /api/auth/first-time-signin` - First-time sign-in with role
-- `POST /api/auth/logout` - User logout
+- `POST /api/auth/register` - User registration
 
-### Employee Management
-- `GET /api/employees` - Get all employees
-- `GET /api/employees/:id` - Get employee by ID
-- `PUT /api/employees/:id` - Update employee
-- `POST /api/employees` - Create new employee
+### Users
+- `GET /api/users/me` - Get current user profile
 
-### Attendance
-- `POST /api/attendance/clock-in` - Clock in
-- `POST /api/attendance/clock-out` - Clock out
-- `GET /api/attendance/:employeeId` - Get attendance history
+### Employees
+- `GET /api/employees/me` - Get current employee profile
+- `POST /api/employees` - Create employee profile
 
-### Leave Management
-- `GET /api/leaves` - Get leave requests
-- `POST /api/leaves` - Create leave request
-- `PUT /api/leaves/:id/approve` - Approve leave
-- `PUT /api/leaves/:id/reject` - Reject leave
+### Health & Testing
+- `GET /` - Root endpoint with status
+- `GET /api/health` - Health check with database status
+- `GET /api/test` - API test endpoint
 
-### Performance
-- `GET /api/performance/goals` - Get performance goals
-- `POST /api/performance/goals` - Create performance goal
-- `GET /api/performance/appraisals` - Get appraisals
+## 🗄️ Database Models
 
-### Payslips
-- `GET /api/payslips` - Get payslips
-- `GET /api/payslips/:id/download` - Download payslip
+### Core Tables
+- **users**: User accounts and authentication
+- **employees**: Employee profiles and information
+- **attendance**: Daily attendance records
+- **leaves**: Leave requests and approvals
+- **payroll**: Salary and payment information
 
-## Database Schema (To be designed)
+### Key Features
+- **Foreign Key Relationships**: Proper referential integrity
+- **Indexes**: Performance-optimized database queries
+- **Data Types**: PostgreSQL-specific optimizations
+- **Cascade Deletes**: Automatic cleanup of related data
 
-### Tables
-- users
-- employees
-- attendance
-- leaves
-- performance_goals
-- appraisals
-- payslips
-- departments
-- roles
+## 🔐 Security Features
 
-## Setup Instructions
+- **JWT Authentication**: Secure token-based authentication
+- **Password Hashing**: bcrypt password encryption
+- **Role-Based Access**: User roles (employee, manager, hr)
+- **SSL Encryption**: Secure database connections
+- **CORS Protection**: Configurable cross-origin policies
 
-1. Choose your preferred backend technology
-2. Set up the project structure
-3. Install dependencies
-4. Configure database connection
-5. Implement API endpoints
-6. Add authentication middleware
-7. Test the API endpoints
+## 📊 Performance Features
 
-## Environment Variables
+- **Connection Pooling**: Optimized database connections
+- **Database Indexes**: Fast query performance
+- **Lazy Loading**: Efficient relationship loading
+- **Query Optimization**: Optimized SQL queries
 
-Create a `.env` file with:
+## 🧪 Testing
+
+### Health Check
+```bash
+curl https://your-app.up.railway.app/api/health
 ```
-DATABASE_URL=your_database_connection_string
-JWT_SECRET=your_jwt_secret
-PORT=3000
-NODE_ENV=development
+
+### API Test
+```bash
+curl https://your-app.up.railway.app/api/test
 ```
+
+### Database Connection
+```bash
+curl https://your-app.up.railway.app/
+```
+
+## 🚨 Troubleshooting
+
+### Common Issues
+
+1. **Database Connection Failed**
+   - Check `DATABASE_URL` format
+   - Ensure SSL mode is set: `?sslmode=require`
+   - Verify Railway PostgreSQL service status
+
+2. **Deployment Issues**
+   - Check Railway logs: `railway logs`
+   - Verify environment variables
+   - Check `requirements.txt` dependencies
+
+3. **SSL Issues**
+   - Ensure `sslmode=require` in connection string
+   - Check Railway PostgreSQL SSL configuration
+
+### Debug Commands
+
+```bash
+# Check Railway status
+railway status
+
+# View deployment logs
+railway logs
+
+# Test database connection
+python init_postgresql_db.py
+
+# Redeploy if needed
+railway up
+```
+
+## 📱 Flutter Integration
+
+After deployment, update your Flutter app:
+
+```dart
+// Update API base URL
+const String baseUrl = 'https://your-app-name.up.railway.app';
+
+// Test connection
+final response = await http.get(Uri.parse('$baseUrl/api/health'));
+```
+
+## 🔄 Development Workflow
+
+1. **Local Development**: Use SQLite for development
+2. **Testing**: Test with local PostgreSQL
+3. **Deployment**: Deploy to Railway with PostgreSQL
+4. **Database**: Initialize with sample data
+5. **Integration**: Update Flutter app with new API URL
+
+## 📋 Dependencies
+
+### Core Dependencies
+- `fastapi` - Web framework
+- `uvicorn[standard]` - ASGI server
+- `sqlalchemy` - Database ORM
+- `psycopg2-binary` - PostgreSQL adapter
+- `python-jose[cryptography]` - JWT handling
+- `passlib[bcrypt]` - Password hashing
+
+### Development Dependencies
+- `python-dotenv` - Environment variable management
+- `alembic` - Database migrations (future use)
+
+## 📄 License
+
+This project is part of the HRMS system. See the main project license for details.
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Test thoroughly
+5. Submit a pull request
+
+## 📞 Support
+
+For issues and questions:
+- Check the troubleshooting section
+- Review Railway deployment logs
+- Check environment variable configuration
+- Verify database connection settings
+
+---
+
+**Happy Coding! 🎉**

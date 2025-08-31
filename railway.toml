@@ -1,0 +1,17 @@
+[build]
+builder = "nixpacks"
+
+[deploy]
+startCommand = "uvicorn main:app --host 0.0.0.0 --port $PORT"
+healthcheckPath = "/api/health"
+healthcheckTimeout = 300
+
+[variables]
+# These will be set in Railway dashboard
+# DATABASE_URL = "postgresql://username:password@host:port/database?sslmode=require"
+# JWT_SECRET = "your-production-secret-key"
+# ACCESS_TOKEN_EXPIRE_MINUTES = "30"
+
+# PostgreSQL SSL configuration
+POSTGRES_SSL_MODE = "require"
+POSTGRES_SSL_CERT = "/etc/ssl/certs/ca-certificates.crt"
